@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div style="text-align: center;">
+    <button id="get_average_power" style="width: 500px; height: 200px; font-size: 100px;">Get Average Power Consumption</button>
+    <button id="get_temp" style="width: 500px; height: 200px; font-size: 100px;">Get Temperature</button>
+    <button id="get_hc" style="width: 500px; height: 200px; font-size: 100px;">Get Headcount</button>
+</div>
+
+
+<script src="node_modules/jquery/dist/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#get_temp").on('click', function () {
+            $.ajax({
+                url: '/api/get_temperature',
+                method: 'GET',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiIwMDAxIiwiYXBwbmFtZSI6InRlbXBlcmF0dXJlIn0.wKUVKLIfuK5zMrMPCU8MgC-Xj7dfXKHal6rojQVdwag');
+                },
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data);
+                    if (data.message === "success") {
+                        alert("Current temperature is " + data.value + " celsius degree");
+                    }
+                }
+            });
+        });
+        $("#get_hc").on('click', function () {
+            $.ajax({
+                url: '/api/get_headcount',
+                method: 'GET',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiIwMDAxIiwiYXBwbmFtZSI6ImhlYWRjb3VudCJ9.1yaw60kn3eFnDtMDt5kT4gk1Soxn4u1GtOTUUNSp6_I');
+                },
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data);
+                    if (data.message === "success") {
+                        alert("There are " + data.value + " humans in this room currently " );
+                    }
+                }
+            });
+        });
+        $("#get_average_power").on('click', function () {
+            $.ajax({
+                url: '/api/get_average_power',
+                method: 'GET',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiIwMDAxIiwiYXBwbmFtZSI6InBvd2VyIn0.K_ZU3wmZMROXoqvjDcFpWicXYrPPe5EhY5PMbi_oN30');
+                },
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data);
+                    if (data.message === "success") {
+                        console.log("??");
+                        alert("The average power consumption is: "+data.value);
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

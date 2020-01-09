@@ -1,0 +1,153 @@
+app_management module
+*********************
+
+app_management.get_container_ip(container_name: str) -> str
+
+   Get container ip address based on its name
+
+   Parameters:
+      **container_name** -- name of the container, returned by
+      spawn_app
+
+   Returns:
+      the ip address in str
+
+   Return type:
+      str
+
+app_management.grant_external_access(container_name: str, protocol: str = '', dst_ip_port: List[str] = None) -> None
+
+   Grant the target container access to external host
+
+   Parameters:
+      * **container_name** -- name of the container, returned by
+        spawn_app
+
+      * **protocol** (*optional*) -- access protocol, could be either
+        tcp or udp
+
+      * **dst_ip_port** (*optional*) -- a two-element list composed of
+        the destination ip addr and port respectively
+
+   Returns:
+   Return type:
+      None
+
+   -[ Examples ]-
+
+   >>> grant_external_access("client002", "udp",["47.254.124.205", "2222"])
+
+app_management.grant_host_access(container_name: str, protocol: str = '', dst_port: str = '')
+
+   Grant the target container access to local host
+
+   Parameters:
+      * **container_name** -- name of the container, returned by
+        spawn_app
+
+      * **protocol** (*optional*) -- access protocol, could be either
+        tcp or udp
+
+      * **dst_port** (*optional*) -- destination port on the local
+        host
+
+   Returns:
+   Return type:
+      None
+
+   -[ Examples ]-
+
+   >>> grant_host_access("client003","udp","2222")
+
+app_management.parse_start_cmd(start_cmd: str) -> str
+
+   a helper function to parse a str command into ENTRYPOINT[List[str]]
+   format
+
+app_management.register_app(app_name: str, ver: str, src_dir: str, start_cmd: str, build_env: str, port: int = None, build_cmd: str = '') -> None
+
+   Register an new app or update an existing app as runnable docker
+   images.
+
+   Parameters:
+      * **app_name** -- desired name of the application
+
+      * **ver** -- version number, could be a regular version number
+        string or 'latest'
+
+      * **src_dir** -- source code directory location
+
+      * **start_cmd** -- starting command as the entry point for the
+        docker
+
+      * **build_env** -- desired building environment i.e. parent
+        docker image)
+
+      * **port** (*optional*) -- port number to be exposed
+
+      * **build_cmd** (*optional*) -- the command used prebuilding to
+        setup the env
+
+   Returns:
+   Return type:
+      None
+
+   -[ Examples ]-
+
+   >>> register_app("webapp", "latest", "./hello_world_web","python index.py", "python:3", 5000)
+
+app_management.rm_container(container_name: str) -> None
+
+   force remove the container with the name
+
+app_management.spawn_app(app_name: str, user_id: str, arguments: str = '') -> str
+
+   Run the target application docker image under specific user with
+   given arguments for that application
+
+   Parameters:
+      * **app_name** -- the application name, same as the one used to
+        register
+
+      * **user_id** -- the identification of the user who's using the
+        app
+
+      * **arguments** (*List**[**str**]**, **optional*) -- arguments
+        for the application
+
+   Returns:
+      The name of the container which accommodates the spawned app
+
+   Return type:
+      str
+
+   -[ Examples ]-
+
+   >>> print(spawn_app("toy_web", "3", "--port 5555"))
+   toy_web3
+
+app_management.start_container(container_name: str) -> None
+
+   start the container with the name
+
+   Parameters:
+      **container_name** -- name of the container, returned by
+      spawn_app
+
+   Returns:
+   Return type:
+      None
+
+app_management.stop_container(container_name: str) -> None
+
+   stop the container with the name Note when --rm is included in
+   parameters for run, this container will be removed after it's
+   stopped.
+
+   Parameters:
+      **container_name** -- name of the container, returned by
+      spawn_app
+
+   Returns:
+   Return type:
+      None

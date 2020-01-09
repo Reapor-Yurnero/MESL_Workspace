@@ -1,0 +1,6 @@
+app_management
+**************
+
+* app_management module
+
+* example module

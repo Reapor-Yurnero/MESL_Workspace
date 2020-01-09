@@ -1,0 +1,269 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>app_management module &#8212; app management 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-app_management">
+<span id="app-management-module"></span><h1>app_management module<a class="headerlink" href="#module-app_management" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="app_management.get_container_ip">
+<code class="sig-prename descclassname">app_management.</code><code class="sig-name descname">get_container_ip</code><span class="sig-paren">(</span><em class="sig-param">container_name: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#app_management.get_container_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get container ip address based on its name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>container_name</strong> – name of the container, returned by spawn_app</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the ip address in str</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="app_management.grant_external_access">
+<code class="sig-prename descclassname">app_management.</code><code class="sig-name descname">grant_external_access</code><span class="sig-paren">(</span><em class="sig-param">container_name: str</em>, <em class="sig-param">protocol: str = ''</em>, <em class="sig-param">dst_ip_port: List[str] = None</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#app_management.grant_external_access" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grant the target container access to external host</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>container_name</strong> – name of the container, returned by spawn_app</p></li>
+<li><p><strong>protocol</strong> (<em>optional</em>) – access protocol, could be either tcp or udp</p></li>
+<li><p><strong>dst_ip_port</strong> (<em>optional</em>) – a two-element list composed of the destination ip addr and port respectively</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grant_external_access</span><span class="p">(</span><span class="s2">&quot;client002&quot;</span><span class="p">,</span> <span class="s2">&quot;udp&quot;</span><span class="p">,[</span><span class="s2">&quot;47.254.124.205&quot;</span><span class="p">,</span> <span class="s2">&quot;2222&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="app_management.grant_host_access">
+<code class="sig-prename descclassname">app_management.</code><code class="sig-name descname">grant_host_access</code><span class="sig-paren">(</span><em class="sig-param">container_name: str</em>, <em class="sig-param">protocol: str = ''</em>, <em class="sig-param">dst_port: str = ''</em><span class="sig-paren">)</span><a class="headerlink" href="#app_management.grant_host_access" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grant the target container access to local host</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>container_name</strong> – name of the container, returned by spawn_app</p></li>
+<li><p><strong>protocol</strong> (<em>optional</em>) – access protocol, could be either tcp or udp</p></li>
+<li><p><strong>dst_port</strong> (<em>optional</em>) – destination port on the local host</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grant_host_access</span><span class="p">(</span><span class="s2">&quot;client003&quot;</span><span class="p">,</span><span class="s2">&quot;udp&quot;</span><span class="p">,</span><span class="s2">&quot;2222&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="app_management.parse_start_cmd">
+<code class="sig-prename descclassname">app_management.</code><code class="sig-name descname">parse_start_cmd</code><span class="sig-paren">(</span><em class="sig-param">start_cmd: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#app_management.parse_start_cmd" title="Permalink to this definition">¶</a></dt>
+<dd><p>a helper function to parse a str command into ENTRYPOINT[List[str]] format</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="app_management.register_app">
+<code class="sig-prename descclassname">app_management.</code><code class="sig-name descname">register_app</code><span class="sig-paren">(</span><em class="sig-param">app_name: str</em>, <em class="sig-param">ver: str</em>, <em class="sig-param">src_dir: str</em>, <em class="sig-param">start_cmd: str</em>, <em class="sig-param">build_env: str</em>, <em class="sig-param">port: int = None</em>, <em class="sig-param">build_cmd: str = ''</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#app_management.register_app" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register an new app or update an existing app as runnable docker images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>app_name</strong> – desired name of the application</p></li>
+<li><p><strong>ver</strong> – version number, could be a regular version number string or ‘latest’</p></li>
+<li><p><strong>src_dir</strong> – source code directory location</p></li>
+<li><p><strong>start_cmd</strong> – starting command as the entry point for the docker</p></li>
+<li><p><strong>build_env</strong> – desired building environment i.e. parent docker image)</p></li>
+<li><p><strong>port</strong> (<em>optional</em>) – port number to be exposed</p></li>
+<li><p><strong>build_cmd</strong> (<em>optional</em>) – the command used prebuilding to setup the env</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">register_app</span><span class="p">(</span><span class="s2">&quot;webapp&quot;</span><span class="p">,</span> <span class="s2">&quot;latest&quot;</span><span class="p">,</span> <span class="s2">&quot;./hello_world_web&quot;</span><span class="p">,</span><span class="s2">&quot;python index.py&quot;</span><span class="p">,</span> <span class="s2">&quot;python:3&quot;</span><span class="p">,</span> <span class="mi">5000</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="app_management.rm_container">
+<code class="sig-prename descclassname">app_management.</code><code class="sig-name descname">rm_container</code><span class="sig-paren">(</span><em class="sig-param">container_name: str</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#app_management.rm_container" title="Permalink to this definition">¶</a></dt>
+<dd><p>force remove the container with the name</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="app_management.spawn_app">
+<code class="sig-prename descclassname">app_management.</code><code class="sig-name descname">spawn_app</code><span class="sig-paren">(</span><em class="sig-param">app_name: str</em>, <em class="sig-param">user_id: str</em>, <em class="sig-param">arguments: str = ''</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#app_management.spawn_app" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the target application docker image under specific user with given arguments for that application</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>app_name</strong> – the application name, same as the one used to register</p></li>
+<li><p><strong>user_id</strong> – the identification of the user who’s using the app</p></li>
+<li><p><strong>arguments</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – arguments for the application</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The name of the container which accommodates the spawned app</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">spawn_app</span><span class="p">(</span><span class="s2">&quot;toy_web&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;--port 5555&quot;</span><span class="p">))</span>
+<span class="go">toy_web3</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="app_management.start_container">
+<code class="sig-prename descclassname">app_management.</code><code class="sig-name descname">start_container</code><span class="sig-paren">(</span><em class="sig-param">container_name: str</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#app_management.start_container" title="Permalink to this definition">¶</a></dt>
+<dd><p>start the container with the name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>container_name</strong> – name of the container, returned by spawn_app</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="app_management.stop_container">
+<code class="sig-prename descclassname">app_management.</code><code class="sig-name descname">stop_container</code><span class="sig-paren">(</span><em class="sig-param">container_name: str</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#app_management.stop_container" title="Permalink to this definition">¶</a></dt>
+<dd><p>stop the container with the name
+Note when –rm is included in parameters for run, this container will be removed after it’s stopped.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>container_name</strong> – name of the container, returned by spawn_app</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">app management</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, xiaohan fu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/app_management.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
