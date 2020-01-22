@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>App2</title>
+</head>
+<body>
+    <button id="get_temp" style="width: 500px; height: 200px; font-size: 40px;">Get Temperature</button>
+    <form action="../../">
+        <button id="exit" style="width: 500px; height: 200px; font-size: 40px;">Exit App2</button>
+    </form>
+
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#get_temp").on('click', function () {
+                $.ajax({
+                    url: '/api/get_temperature',
+                    method: 'GET',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBuYW1lIjoiYXBwMiIsInVzZXJpZCI6ImZ4aCJ9.INa2D70P3Dp9mPExjkSxVauB3icgDbaoABCboQZ5HXg');
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        console.log(data);
+                        if (data.message === "success") {
+                            alert("Current temperature is " + data.value + " celsius degree");
+                        }
+                    }
+                });
+            });
+            $("#exit").on('click', function () {
+                $.ajax({
+                    url: '/api/exit',
+                    method: 'GET',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBuYW1lIjoiYXBwMiIsInVzZXJpZCI6ImZ4aCJ9.INa2D70P3Dp9mPExjkSxVauB3icgDbaoABCboQZ5HXg');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

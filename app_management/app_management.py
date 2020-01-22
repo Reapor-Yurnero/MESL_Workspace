@@ -1,8 +1,17 @@
 # import subprocess
 from shlex import split
 import docker
+from docker.errors import APIError
+
 import iptables_manager
+import redis
+
 docker_client = docker.from_env()
+
+redis_host = "localhost"
+redis_port = 6379
+redis_password = ""
+redis_db = redis.StrictRedis(host=redis_host, port=redis_port, password=redis_password, decode_responses=True)
 
 
 def register_app(app_name:str, ver:str, src_dir:str, start_cmd:str, build_env:str, port:int or None = None, build_cmd:str = '') -> None:
@@ -38,6 +47,8 @@ def register_app(app_name:str, ver:str, src_dir:str, start_cmd:str, build_env:st
 	# type check
 	if not isinstance(app_name, str):
 		raise TypeError("app name is expected to be str")
+	elif app_name == '' or len(app_name) > 11:
+		raise ValueError("app_name is expected to be a none empty string shorter than 12 characters")
 	if not isinstance(ver, str):
 		raise TypeError("version number is expected to be str")
 	if not isinstance(src_dir, str):
@@ -67,7 +78,8 @@ def register_app(app_name:str, ver:str, src_dir:str, start_cmd:str, build_env:st
 
 	# build the docker image
 	# subprocess.run(["docker", "build", src_dir, "-t", app_name+":"+ver])
-	docker_client.images.build(path=src_dir, tag=app_name + ':' + ver)
+	return docker_client.images.build(path=src_dir, tag=app_name + ':' + ver)
+
 
 def parse_start_cmd(start_cmd:str) -> str:
 	"""a helper function to parse a str command into ENTRYPOINT[List[str]] format"""
@@ -104,13 +116,17 @@ def spawn_app(app_name:str, user_id:str, arguments:str = '') -> str:
 	# type check
 	if not isinstance(app_name, str):
 		raise TypeError("app name is expected to be str")
+	elif app_name == '' or len(app_name) > 11:
+		raise ValueError("app_name is expected to be a none empty string shorter than 12 characters")
 	if not isinstance(user_id, str):
 		raise TypeError("user id is expected to be str")
+	elif user_id == '' or len(user_id) > 11:
+		raise ValueError("user_id is expected to be a none empty string shorter than 12 characters")
 	if not isinstance(arguments, str):
 		raise TypeError("arguments is expected to be str")
 
 	# default parameter, could be modified to kwargs in the future for more flexible settings
-	parameters = ["-d", "-m", "64MB", "--network", "isolated_nw", "--rm"]
+	# parameters = ["-d", "-m", "64MB", "--network", "isolated_nw", "--rm"]
 	# container naming is subject to changes
 	container_name = app_name+"-"+user_id
 	# ensure the container name is shorter than 24
@@ -121,9 +137,19 @@ def spawn_app(app_name:str, user_id:str, arguments:str = '') -> str:
 	arguments = split(arguments)
 	# run the docker image in container
 	# subprocess.run(["docker", "run"]+parameters+["--name", container_name, app_name]+arguments)
-	# docker_client.containers.run(image=app_name, command=arguments, detach=True, mem_limit='64m', network='isolated_nw', remove=True, name=container_name)
+
+	try:
+		print("run container")
+		docker_client.containers.run(image=app_name, command=arguments, detach=True, mem_limit='64m', network='isolated_nw', remove=True, name=container_name)
+	except APIError as e:
+		print(e)
+		return ''
+	# docker_client.containers.run(image=app_name, command=arguments, stdin_open=True, mem_limit='64m', network='isolated_nw', remove=True, name=container_name)
+
+	# create corresponding iptables chain
 	iptables_manager.create_chain(container_name)
-	docker_client.containers.run(image=app_name, command=arguments, stdin_open=True, mem_limit='64m', network='isolated_nw', remove=True, name=container_name)
+	# create entry in database
+	redis_db.set(container_name, get_container_ip(container_name))
 	return container_name
 
 
@@ -153,6 +179,7 @@ def stop_container(container_name:str) -> None:
 	# subprocess.run(["docker", "stop", container_name])
 	docker_client.containers.get(container_name).stop()
 	iptables_manager.delete_chain(container_name)
+	redis_db.delete(container_name)
 
 
 def start_container(container_name:str) -> None:
@@ -203,4 +230,4 @@ def get_container_ip(container_name:str) -> str:
 	# rt = subprocess.run(split("docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "+
 	# 						  container_name),stdout=subprocess.PIPE)
 	# return rt.stdout.decode("UTF-8")[:-1]
-	return 	docker_client.containers.get(container_name).attrs['NetworkSettings']['Networks']['isolated_nw']['IPAddress']
+	return docker_client.containers.get(container_name).attrs['NetworkSettings']['Networks']['isolated_nw']['IPAddress']

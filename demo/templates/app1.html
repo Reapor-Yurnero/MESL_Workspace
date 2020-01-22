@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>App1</title>
+</head>
+<body>
+    <button id="get_average_power" style="width: 500px; height: 200px; font-size: 40px;">Get Average Power Consumption</button>
+
+    <button id="get_hello" style="width: 500px; height: 200px; font-size: 20px;">Get Hello</button>
+
+    <form action="../../">
+        <button id="exit" style="width: 500px; height: 200px; font-size: 40px;">Exit App1</button>
+    </form>
+
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#get_average_power").on('click', function () {
+                $.ajax({
+                    url: '/api/get_average_power',
+                    method: 'GET',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBuYW1lIjoiYXBwMSIsInVzZXJpZCI6ImZ4aCJ9.eCn0jL2eoWA-koUPBPEqDC1p9K7dZiTOwQnsqou-lP4');
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        console.log(data);
+                        if (data.message === "success") {
+                            console.log("??");
+                            alert("The average power consumption is: "+data.value);
+                        }
+                    }
+                });
+            });
+            $("#get_hello").on('click', function () {
+                $.ajax({
+                    url: '/api/get_hello',
+                    method: 'GET',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBuYW1lIjoiYXBwMSIsInVzZXJpZCI6ImZ4aCJ9.eCn0jL2eoWA-koUPBPEqDC1p9K7dZiTOwQnsqou-lP4');
+                    },
+                    success: function (data) {
+                        alert(data)
+                    }
+                });
+            });
+            $("#exit").on('click', function () {
+                $.ajax({
+                    url: '/api/exit',
+                    method: 'GET',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBuYW1lIjoiYXBwMSIsInVzZXJpZCI6ImZ4aCJ9.eCn0jL2eoWA-koUPBPEqDC1p9K7dZiTOwQnsqou-lP4');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>App3</title>
+</head>
+<body>
+    <button id="get_hc" style="width: 500px; height: 200px; font-size: 40px;">Get Head Count in Room</button>
+    <form action="../../">
+        <button id="exit" style="width: 500px; height: 200px; font-size: 40px;">Exit App3</button>
+    </form>
+
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#get_hc").on('click', function () {
+                $.ajax({
+                    url: '/api/get_headcount',
+                    method: 'GET',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBuYW1lIjoiYXBwMyIsInVzZXJpZCI6ImZ4aCJ9.w1PclqQnGgIVcz8q9P8m5jEUgIOJ_Z1J_KpoJ_YRniU');
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        console.log(data);
+                        if (data.message === "success") {
+                            alert("There are " + data.value + " humans in this room currently " );
+                        }
+                    }
+                });
+            });
+            $("#exit").on('click', function () {
+                $.ajax({
+                    url: '/api/exit',
+                    method: 'GET',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBuYW1lIjoiYXBwMyIsInVzZXJpZCI6ImZ4aCJ9.w1PclqQnGgIVcz8q9P8m5jEUgIOJ_Z1J_KpoJ_YRniU');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

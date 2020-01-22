@@ -1,5 +1,9 @@
 # MESL Workspace
 
+## TODO
+[] argument check for app_management
+[] better return meaning for app_management
+
 ## APP Management
 
 A function library for app management including register app, spawn app, run/stop/rm app and control internet accessibility of app
