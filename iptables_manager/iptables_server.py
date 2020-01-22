@@ -7,7 +7,7 @@ import logging
 import iptables_manager_pb2_grpc
 import iptables_manager_pb2
 
-import iptables_manager
+import iptables_manager_core
 
 
 class IptablesManagerServicer(iptables_manager_pb2_grpc.IptablesManagerServicer):
@@ -15,7 +15,7 @@ class IptablesManagerServicer(iptables_manager_pb2_grpc.IptablesManagerServicer)
         res = iptables_manager_pb2.Response()
         res.status = 1
         try:
-            iptables_manager.create_chain(request.container_name)
+            iptables_manager_core.create_chain(request.container_name)
         except TypeError:
             print("type error")
             res.status = -1
@@ -28,7 +28,7 @@ class IptablesManagerServicer(iptables_manager_pb2_grpc.IptablesManagerServicer)
         res = iptables_manager_pb2.Response()
         res.status = 1
         try:
-            iptables_manager.delete_chain(request.container_name)
+            iptables_manager_core.delete_chain(request.container_name)
         except TypeError:
             print("type error")
             res.status = -1
@@ -46,7 +46,7 @@ class IptablesManagerServicer(iptables_manager_pb2_grpc.IptablesManagerServicer)
         dst_ip = request.dst_ip
         dst_port = request.dst_port
         try:
-            iptables_manager.grant_external_access(cname, cip, protocol, dst_ip, dst_port)
+            iptables_manager_core.grant_external_access(cname, cip, protocol, dst_ip, dst_port)
         except TypeError:
             print("type error")
             res.status = -1
@@ -64,7 +64,7 @@ class IptablesManagerServicer(iptables_manager_pb2_grpc.IptablesManagerServicer)
         dst_ip = request.dst_ip
         dst_port = request.dst_port
         try:
-            iptables_manager.revoke_external_access(cname, cip, protocol, dst_ip, dst_port)
+            iptables_manager_core.revoke_external_access(cname, cip, protocol, dst_ip, dst_port)
         except TypeError:
             print("type error")
             res.status = -1
@@ -81,7 +81,7 @@ class IptablesManagerServicer(iptables_manager_pb2_grpc.IptablesManagerServicer)
         protocol = request.protocol
         dst_port = request.dst_port
         try:
-            iptables_manager.grant_host_access(cname, cip, protocol, dst_port)
+            iptables_manager_core.grant_host_access(cname, cip, protocol, dst_port)
         except TypeError:
             print("type error")
             res.status = -1
@@ -98,7 +98,7 @@ class IptablesManagerServicer(iptables_manager_pb2_grpc.IptablesManagerServicer)
         protocol = request.protocol
         dst_port = request.dst_port
         try:
-            iptables_manager.revoke_host_access(cname, cip, protocol, dst_port)
+            iptables_manager_core.revoke_host_access(cname, cip, protocol, dst_port)
         except TypeError:
             print("type error")
             res.status = -1
@@ -111,7 +111,7 @@ class IptablesManagerServicer(iptables_manager_pb2_grpc.IptablesManagerServicer)
         res = iptables_manager_pb2.Response()
         res.status = 1
         try:
-            iptables_manager.revoke_all_access(request.container_name, request.option)
+            iptables_manager_core.revoke_all_access(request.container_name, request.option)
         except TypeError:
             print("type error")
             res.status = -1

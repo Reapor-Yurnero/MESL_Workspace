@@ -1,5 +1,8 @@
-import subprocess
+# import subprocess
 from shlex import split
+import docker
+import iptables_manager
+docker_client = docker.from_env()
 
 
 def register_app(app_name:str, ver:str, src_dir:str, start_cmd:str, build_env:str, port:int or None = None, build_cmd:str = '') -> None:
@@ -63,8 +66,8 @@ def register_app(app_name:str, ver:str, src_dir:str, start_cmd:str, build_env:st
 		f.writelines(contents)
 
 	# build the docker image
-	subprocess.run(["docker", "build", src_dir, "-t", app_name+":"+ver])
-
+	# subprocess.run(["docker", "build", src_dir, "-t", app_name+":"+ver])
+	docker_client.images.build(path=src_dir, tag=app_name + ':' + ver)
 
 def parse_start_cmd(start_cmd:str) -> str:
 	"""a helper function to parse a str command into ENTRYPOINT[List[str]] format"""
@@ -83,7 +86,7 @@ def spawn_app(app_name:str, user_id:str, arguments:str = '') -> str:
 	user_id
 		the identification of the user who's using the app
 	arguments: List[str], optional
-		arguments for the application
+		additional arguments for the application
 
 	Returns
 	-------
@@ -110,10 +113,17 @@ def spawn_app(app_name:str, user_id:str, arguments:str = '') -> str:
 	parameters = ["-d", "-m", "64MB", "--network", "isolated_nw", "--rm"]
 	# container naming is subject to changes
 	container_name = app_name+"-"+user_id
+	# ensure the container name is shorter than 24
+	if len(container_name) > 23:
+		sub: int = 23-len(container_name)
+		container_name = app_name[0:sub]+"-"+user_id
 	# parse the arguments to List(str)
 	arguments = split(arguments)
 	# run the docker image in container
-	subprocess.run(["docker", "run"]+parameters+["--name", container_name, app_name]+arguments)
+	# subprocess.run(["docker", "run"]+parameters+["--name", container_name, app_name]+arguments)
+	# docker_client.containers.run(image=app_name, command=arguments, detach=True, mem_limit='64m', network='isolated_nw', remove=True, name=container_name)
+	iptables_manager.create_chain(container_name)
+	docker_client.containers.run(image=app_name, command=arguments, stdin_open=True, mem_limit='64m', network='isolated_nw', remove=True, name=container_name)
 	return container_name
 
 
@@ -126,7 +136,7 @@ def spawn_app(app_name:str, user_id:str, arguments:str = '') -> str:
 def stop_container(container_name:str) -> None:
 	"""
 	stop the container with the name
-	Note when --rm is included in parameters for run, this container will be removed after it's stopped.
+	Note when --rm is included in parameters for run by default, this container will be removed after it's stopped.
 
 	Parameters
 	----------
@@ -140,7 +150,9 @@ def stop_container(container_name:str) -> None:
 	"""
 	if not isinstance(container_name, str):
 		raise TypeError("container name is expected to be str")
-	subprocess.run(["docker", "stop", container_name])
+	# subprocess.run(["docker", "stop", container_name])
+	docker_client.containers.get(container_name).stop()
+	iptables_manager.delete_chain(container_name)
 
 
 def start_container(container_name:str) -> None:
@@ -159,7 +171,8 @@ def start_container(container_name:str) -> None:
 	"""
 	if not isinstance(container_name, str):
 		raise TypeError("container name is expected to be str")
-	subprocess.run(["docker", "start", container_name])
+	# subprocess.run(["docker", "start", container_name])
+	docker_client.containers.get(container_name).start()
 
 
 def rm_container(container_name:str) -> None:
@@ -167,7 +180,9 @@ def rm_container(container_name:str) -> None:
 	if not isinstance(container_name, str):
 		print("Container Name is Expected to be Str")
 		return
-	subprocess.run(["docker", "rm", "--force", container_name])
+	# subprocess.run(["docker", "rm", "--force", container_name])
+	docker_client.containers.get(container_name).remove(force=True)
+	iptables_manager.delete_chain(container_name)
 
 
 def get_container_ip(container_name:str) -> str:
@@ -185,6 +200,7 @@ def get_container_ip(container_name:str) -> str:
 		the ip address in str
 
 	"""
-	rt = subprocess.run(split("docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "+
-							  container_name),stdout=subprocess.PIPE)
-	return rt.stdout.decode("UTF-8")[:-1]
+	# rt = subprocess.run(split("docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "+
+	# 						  container_name),stdout=subprocess.PIPE)
+	# return rt.stdout.decode("UTF-8")[:-1]
+	return 	docker_client.containers.get(container_name).attrs['NetworkSettings']['Networks']['isolated_nw']['IPAddress']

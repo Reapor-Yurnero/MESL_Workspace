@@ -1,17 +1,9 @@
-import grpc
-
-# import the generated classes
-import iptables_manager_pb2_grpc
-import iptables_manager_pb2
-
-# open a gRPC channel
-channel = grpc.insecure_channel('localhost:50051')
-
-# create a stub (client)
-stub = iptables_manager_pb2_grpc.IptablesManagerStub(channel)
+import subprocess
+from typing import List
+from shlex import split
 
 
-def create_chain(container_name: str) -> int:
+def create_chain(container_name: str):
     """
     Create iptables chains with the same name as the container name into DOCKER-USER chain and INPUT chain
 
@@ -19,10 +11,9 @@ def create_chain(container_name: str) -> int:
     ----------
     container_name
         name of the container i.e. returned by app_management.spawn_app
-
     Returns
     -------
-    Status of request: 1 -> success, -1 -> TypeError
+    None
 
     """
     # argument check
@@ -30,26 +21,38 @@ def create_chain(container_name: str) -> int:
         raise TypeError("container_name is expected to be str")
     elif container_name == '':
         raise ValueError("container_name is expected to be non empty")
+    cmd = "sudo iptables -N " + container_name+"-extn"
+    subprocess.run(split(cmd))
+    cmd = "iptables -I DOCKER-USER -j " + container_name+"-extn"
+    subprocess.run(split(cmd))
+    cmd = "sudo iptables -N " + container_name+"-host"
+    subprocess.run(split(cmd))
+    cmd = "iptables -I INPUT -j " + container_name + "-host"
+    subprocess.run(split(cmd))
 
-    cname = iptables_manager_pb2.Cname(container_name=container_name)
-    res = stub.CreateChain(cname)
-    return res
 
-
-def delete_chain(container_name: str) -> int:
+def delete_chain(container_name: str):
     # argument check
     if not isinstance(container_name, str):
         raise TypeError("container_name is expected to be str")
     elif container_name == '':
         raise ValueError("container_name is expected to be non empty")
 
-    cname = iptables_manager_pb2.Cname(container_name=container_name)
-    res = stub.DeleteChain(cname)
-    return res
+    revoke_all_access(container_name)
+
+    cmd = "iptables -D DOCKER-USER -j " + container_name+"-extn"
+    subprocess.run(split(cmd))
+    cmd = "sudo iptables -X " + container_name+"-extn"
+    subprocess.run(split(cmd))
+
+    cmd = "iptables -D INPUT -j " + container_name + "-host"
+    subprocess.run(split(cmd))
+    cmd = "sudo iptables -X " + container_name+"-host"
+    subprocess.run(split(cmd))
 
 
 def grant_external_access(container_name: str, container_ip: str, protocol: str = '', dst_ip: str = '',
-                          dst_port: str = '') -> int:
+                          dst_port: str = '') -> None:
     """
     Grant the target container access to external host
 
@@ -68,7 +71,7 @@ def grant_external_access(container_name: str, container_ip: str, protocol: str 
 
     Returns
     -------
-    Status of request: 1 -> success, -1 -> TypeError
+    None
 
     Examples
     --------
@@ -91,10 +94,34 @@ def grant_external_access(container_name: str, container_ip: str, protocol: str 
         raise TypeError("dst_ip is expected to be str")
     if not isinstance(dst_port, str):
         raise TypeError("dst_port is expected to be str")
+    # if dst_ip_port is not None and \
+    # not (isinstance(dst_ip_port, List) and len(dst_ip_port) == 2 and all(isinstance(item, str) for item in dst_ip_port)):
+    #     raise TypeError("dst_ip_port is expected to be a two element str list")
 
-    request = iptables_manager_pb2.ExternalAccessRequest(container_name=container_name,container_ip=container_ip,protocol=protocol,dst_ip=dst_ip,dst_port=dst_port)
-    res = stub.GrantExternalAccess(request)
-    return res
+    # cip = get_container_ip(container_name)
+    cip = container_ip
+
+    # manipulate the iptables
+    cmd = "sudo iptables -I "
+    # define the spec, container_name here is the chain name
+    spec = container_name + "-extn" + " -i docker1 "
+    if protocol is not '':
+        spec = spec + "-p " + protocol + " "
+    spec = spec + "-s " + cip + " "
+    if dst_ip is not '':
+        spec += "-d " + dst_ip + " "
+    if dst_port is not '':
+        spec += "--dport " + dst_port + " "
+    # if dst_ip_port is not None:
+    #     if dst_ip_port[0] is not '':
+    #         spec = spec + "-d " + dst_ip_port[0] + " "
+    #     if dst_ip_port[1] is not '':
+    #         spec = spec + "--dport " + dst_ip_port[1]+ " "
+    spec = spec + "-j ACCEPT"
+
+    cmd += spec
+    subprocess.run(split(cmd))
+
 
 def grant_host_access(container_name: str, container_ip: str, protocol: str = '', dst_port: str = ''):
     """
@@ -134,9 +161,22 @@ def grant_host_access(container_name: str, container_ip: str, protocol: str = ''
     if not isinstance(dst_port, str):
         raise TypeError("dst_port is expected to be str")
 
-    request = iptables_manager_pb2.HostAccessRequest(container_name=container_name,container_ip=container_ip,protocol=protocol,dst_port=dst_port)
-    res = stub.GrantHostAccess(request)
-    return res
+    # cip = get_container_ip(container_name)
+    cip = container_ip
+
+    # manipulate the iptables
+    cmd = "sudo iptables -I "
+    # specify the spec
+    spec = container_name + "-host" + " -i docker1 "
+    if protocol is not '':
+        spec = spec + "-p " + protocol + " "
+    spec = spec + "-s " + cip + " "
+    if dst_port is not '':
+        spec = spec + "--dport " + dst_port + " "
+    spec = spec + "-j ACCEPT"
+
+    cmd += spec
+    subprocess.run(split(cmd))
 
 
 def revoke_all_access(container_name: str, option: int=0):
@@ -163,9 +203,17 @@ def revoke_all_access(container_name: str, option: int=0):
     if not isinstance(option, int):
         raise TypeError("option is expected to be str")
 
-    cname = iptables_manager_pb2.RevokeAllRequest(container_name=container_name)
-    res = stub.RevokeAllAccess(cname)
-    return res
+    if option == 0:
+        cmd = "sudo iptables -F " + container_name + "-extn"
+        subprocess.run(split(cmd))
+        cmd = "sudo iptables -F " + container_name + "-host"
+        subprocess.run(split(cmd))
+    elif option == 1:
+        cmd = "sudo iptables -F " + container_name + "-extn"
+        subprocess.run(split(cmd))
+    elif option == 2:
+        cmd = "sudo iptables -F " + container_name + "-host"
+        subprocess.run(split(cmd))
 
 
 def revoke_external_access(container_name: str, container_ip: str, protocol: str = '', dst_ip: str = '',
@@ -211,10 +259,33 @@ def revoke_external_access(container_name: str, container_ip: str, protocol: str
         raise TypeError("dst_ip is expected to be str")
     if not isinstance(dst_port, str):
         raise TypeError("dst_port is expected to be str")
+    # if dst_ip_port is not None and not (isinstance(dst_ip_port, List) and len(dst_ip_port) == 2 and all(
+    #         isinstance(item, str) for item in dst_ip_port)):
+    #     raise TypeError("dst_ip_port is expected to be a two element str list")
 
-    request = iptables_manager_pb2.ExternalAccessRequest(container_name=container_name,container_ip=container_ip,protocol=protocol,dst_ip=dst_ip,dst_port=dst_port)
-    res = stub.RevokeExternalAccess(request)
-    return res
+    # cip = get_container_ip(container_name)
+    cip = container_ip
+
+    # manipulate the iptables
+    cmd = "sudo iptables -D "
+    # define the spec
+    spec = container_name + "-extn" + " -i docker1 "
+    if protocol is not '':
+        spec = spec + "-p " + protocol + " "
+    spec = spec + "-s " + cip + " "
+    if dst_ip is not '':
+        spec += "-d " + dst_ip + " "
+    if dst_port is not '':
+        spec += "--dport " + dst_port + " "
+    # if dst_ip_port is not None:
+    #     if dst_ip_port[0] is not '':
+    #         spec = spec + "-d " + dst_ip_port[0] + " "
+    #     if dst_ip_port[1] is not '':
+    #         spec = spec + "--dport " + dst_ip_port[1] + " "
+    spec = spec + "-j ACCEPT"
+
+    cmd += spec
+    subprocess.run(split(cmd))
 
 
 def revoke_host_access(container_name: str, container_ip: str, protocol: str = '', dst_port: str = ''):
@@ -255,6 +326,19 @@ def revoke_host_access(container_name: str, container_ip: str, protocol: str = '
     if not isinstance(dst_port, str):
         raise TypeError("dst_port is expected to be str")
 
-    request = iptables_manager_pb2.HostAccessRequest(container_name=container_name,container_ip=container_ip,protocol=protocol,dst_port=dst_port)
-    res = stub.RevokeHostAccess(request)
-    return res
+    # cip = get_container_ip(container_name)
+    cip = container_ip
+
+    # manipulate the iptables
+    cmd = "sudo iptables -D "
+    # specify the spec
+    spec = container_name + "-host" + " -i docker1 "
+    if protocol is not '':
+        spec = spec + "-p " + protocol + " "
+    spec = spec + "-s " + cip + " "
+    if dst_port is not '':
+        spec = spec + "--dport " + dst_port + " "
+    spec = spec + "-j ACCEPT"
+
+    cmd += spec
+    subprocess.run(split(cmd))
