@@ -1,8 +1,18 @@
 # MESL Workspace
 
 ## TODO
-[] argument check for app_management
+[] change variable name and comments to container_id for iptables_manager part
+[x] argument check for app_management
 [] better return meaning for app_management
+
+## DEMO
+
+1. `sudo sh init.sh` if hasn't since last reboot
+2. `python3 demo/reg.py` if hasn't ever
+3. `sudo python3 iptables_manager/iptables_server.py` to start the iptables_manager service
+4. Run `app_management/hello_world_web/index.py` to start the toy api server on host
+5. Run `demo/app.py` to start the demo
+6. Click button APP1 to spawn a docker for app1. Click get hello message button to test api call to host (started on step 4). This is approved because of the iptables rule preset
 
 ## APP Management
 
