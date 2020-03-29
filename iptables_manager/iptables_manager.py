@@ -11,13 +11,13 @@ channel = grpc.insecure_channel('localhost:50051')
 stub = iptables_manager_pb2_grpc.IptablesManagerStub(channel)
 
 
-def create_chain(container_name: str) -> int:
+def create_chain(container_id: str) -> int:
     """
     Create iptables chains with the same name as the container name into DOCKER-USER chain and INPUT chain
 
     Parameters
     ----------
-    container_name
+    container_id
         name of the container i.e. returned by app_management.spawn_app
 
     Returns
@@ -26,36 +26,36 @@ def create_chain(container_name: str) -> int:
 
     """
     # argument check
-    if not isinstance(container_name, str):
-        raise TypeError("container_name is expected to be str")
-    elif container_name == '':
-        raise ValueError("container_name is expected to be non empty")
+    if not isinstance(container_id, str):
+        raise TypeError("container_id is expected to be str")
+    elif container_id == '':
+        raise ValueError("container_id is expected to be non empty")
 
-    cname = iptables_manager_pb2.Cname(container_name=container_name)
+    cname = iptables_manager_pb2.Cname(container_name=container_id)
     res = stub.CreateChain(cname)
     return res
 
 
-def delete_chain(container_name: str) -> int:
+def delete_chain(container_id: str) -> int:
     # argument check
-    if not isinstance(container_name, str):
-        raise TypeError("container_name is expected to be str")
-    elif container_name == '':
-        raise ValueError("container_name is expected to be non empty")
+    if not isinstance(container_id, str):
+        raise TypeError("container_id is expected to be str")
+    elif container_id == '':
+        raise ValueError("container_id is expected to be non empty")
 
-    cname = iptables_manager_pb2.Cname(container_name=container_name)
+    cname = iptables_manager_pb2.Cname(container_name=container_id)
     res = stub.DeleteChain(cname)
     return res
 
 
-def grant_external_access(container_name: str, container_ip: str, protocol: str = '', dst_ip: str = '',
+def grant_external_access(container_id: str, container_ip: str, protocol: str = '', dst_ip: str = '',
                           dst_port: str = '') -> int:
     """
     Grant the target container access to external host
 
     Parameters
     ----------
-    container_name
+    container_id
         name of the container i.e. returned by app_management.spawn_app
     container_ip
         ip addr of the container i.e. returned by app_management.get_container_ip
@@ -77,10 +77,10 @@ def grant_external_access(container_name: str, container_ip: str, protocol: str 
 
     """
     # argument check
-    if not isinstance(container_name, str):
-        raise TypeError("container_name is expected to be str")
-    elif container_name == '':
-        raise ValueError("container_name is expected to be non empty")
+    if not isinstance(container_id, str):
+        raise TypeError("container_id is expected to be str")
+    elif container_id == '':
+        raise ValueError("container_id is expected to be non empty")
     if not isinstance(container_ip, str):
         raise TypeError("container_ip is expected to be str")
     elif container_ip == '':
@@ -92,17 +92,17 @@ def grant_external_access(container_name: str, container_ip: str, protocol: str 
     if not isinstance(dst_port, str):
         raise TypeError("dst_port is expected to be str")
 
-    request = iptables_manager_pb2.ExternalAccessRequest(container_name=container_name,container_ip=container_ip,protocol=protocol,dst_ip=dst_ip,dst_port=dst_port)
+    request = iptables_manager_pb2.ExternalAccessRequest(container_name=container_id, container_ip=container_ip, protocol=protocol, dst_ip=dst_ip, dst_port=dst_port)
     res = stub.GrantExternalAccess(request)
     return res
 
-def grant_host_access(container_name: str, container_ip: str, protocol: str = '', dst_port: str = ''):
+def grant_host_access(container_id: str, container_ip: str, protocol: str = '', dst_port: str = ''):
     """
     Grant the target container access to local host
 
     Parameters
     ----------
-    container_name
+    container_id
         name of the container i.e. returned by app_management.spawn_app
     container_ip
         ip addr of the container i.e. returned by app_management.get_container_ip
@@ -121,10 +121,10 @@ def grant_host_access(container_name: str, container_ip: str, protocol: str = ''
 
     """
     # argument check
-    if not isinstance(container_name, str):
-        raise TypeError("container_name is expected to be str")
-    elif container_name == '':
-        raise ValueError("container_name is expected to be non empty")
+    if not isinstance(container_id, str):
+        raise TypeError("container_id is expected to be str")
+    elif container_id == '':
+        raise ValueError("container_id is expected to be non empty")
     if not isinstance(container_ip, str):
         raise TypeError("container_ip is expected to be str")
     elif container_ip == '':
@@ -134,17 +134,17 @@ def grant_host_access(container_name: str, container_ip: str, protocol: str = ''
     if not isinstance(dst_port, str):
         raise TypeError("dst_port is expected to be str")
 
-    request = iptables_manager_pb2.HostAccessRequest(container_name=container_name,container_ip=container_ip,protocol=protocol,dst_port=dst_port)
+    request = iptables_manager_pb2.HostAccessRequest(container_name=container_id, container_ip=container_ip, protocol=protocol, dst_port=dst_port)
     res = stub.GrantHostAccess(request)
     return res
 
 
-def revoke_all_access(container_name: str, option: int=0):
+def revoke_all_access(container_id: str, option: int=0):
     """
     Revoke all accesses granted to a particular container
     Parameters
     ----------
-    container_name
+    container_id
         name of the container i.e. returned by app_management.spawn_app
     option: optional
         0, flush both external and host access
@@ -156,26 +156,26 @@ def revoke_all_access(container_name: str, option: int=0):
 
     """
     # argument check
-    if not isinstance(container_name, str):
-        raise TypeError("container_name is expected to be str")
-    elif container_name == '':
-        raise ValueError("container_name is expected to be non empty")
+    if not isinstance(container_id, str):
+        raise TypeError("container_id is expected to be str")
+    elif container_id == '':
+        raise ValueError("container_id is expected to be non empty")
     if not isinstance(option, int):
         raise TypeError("option is expected to be str")
 
-    cname = iptables_manager_pb2.RevokeAllRequest(container_name=container_name)
+    cname = iptables_manager_pb2.RevokeAllRequest(container_name=container_id)
     res = stub.RevokeAllAccess(cname)
     return res
 
 
-def revoke_external_access(container_name: str, container_ip: str, protocol: str = '', dst_ip: str = '',
-                          dst_port: str = '') -> None:
+def revoke_external_access(container_id: str, container_ip: str, protocol: str = '', dst_ip: str = '',
+                           dst_port: str = '') -> None:
     """
     Revoke the target container access to external host
 
     Parameters
     ----------
-    container_name
+    container_id
         name of the container i.e. returned by app_management.spawn_app
     container_ip
         ip addr of the container i.e. returned by app_management.get_container_ip
@@ -197,10 +197,10 @@ def revoke_external_access(container_name: str, container_ip: str, protocol: str
 
     """
     # argument check
-    if not isinstance(container_name, str):
-        raise TypeError("container_name is expected to be str")
-    elif container_name == '':
-        raise ValueError("container_name is expected to be non empty")
+    if not isinstance(container_id, str):
+        raise TypeError("container_id is expected to be str")
+    elif container_id == '':
+        raise ValueError("container_id is expected to be non empty")
     if not isinstance(container_ip, str):
         raise TypeError("container_ip is expected to be str")
     elif container_ip == '':
@@ -212,18 +212,18 @@ def revoke_external_access(container_name: str, container_ip: str, protocol: str
     if not isinstance(dst_port, str):
         raise TypeError("dst_port is expected to be str")
 
-    request = iptables_manager_pb2.ExternalAccessRequest(container_name=container_name,container_ip=container_ip,protocol=protocol,dst_ip=dst_ip,dst_port=dst_port)
+    request = iptables_manager_pb2.ExternalAccessRequest(container_name=container_id, container_ip=container_ip, protocol=protocol, dst_ip=dst_ip, dst_port=dst_port)
     res = stub.RevokeExternalAccess(request)
     return res
 
 
-def revoke_host_access(container_name: str, container_ip: str, protocol: str = '', dst_port: str = ''):
+def revoke_host_access(container_id: str, container_ip: str, protocol: str = '', dst_port: str = ''):
     """
     Revoke the target container access to local host
 
     Parameters
     ----------
-    container_name
+    container_id
         name of the container i.e. returned by app_management.spawn_app
     container_ip
         ip addr of the container i.e. returned by app_management.get_container_ip
@@ -242,10 +242,10 @@ def revoke_host_access(container_name: str, container_ip: str, protocol: str = '
 
     """
     # argument check
-    if not isinstance(container_name, str):
-        raise TypeError("container_name is expected to be str")
-    elif container_name == '':
-        raise ValueError("container_name is expected to be non empty")
+    if not isinstance(container_id, str):
+        raise TypeError("container_id is expected to be str")
+    elif container_id == '':
+        raise ValueError("container_id is expected to be non empty")
     if not isinstance(container_ip, str):
         raise TypeError("container_ip is expected to be str")
     elif container_ip == '':
@@ -255,6 +255,6 @@ def revoke_host_access(container_name: str, container_ip: str, protocol: str = '
     if not isinstance(dst_port, str):
         raise TypeError("dst_port is expected to be str")
 
-    request = iptables_manager_pb2.HostAccessRequest(container_name=container_name,container_ip=container_ip,protocol=protocol,dst_port=dst_port)
+    request = iptables_manager_pb2.HostAccessRequest(container_name=container_id, container_ip=container_ip, protocol=protocol, dst_port=dst_port)
     res = stub.RevokeHostAccess(request)
     return res

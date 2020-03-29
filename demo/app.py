@@ -30,7 +30,8 @@ def hello_world():
 def render_app1():
     print("run /app/app1")
     cname = app_management.spawn_app("app1", "fxh")  # user name is hard coded here, can be fetched with multiple methods
-    iptables_manager.grant_host_access(cname, redis_db.get(cname),"tcp","5001")
+    cid = app_management.get_container_id(cname)
+    iptables_manager.grant_host_access(cid, redis_db.get(cname),"tcp","5001")
     return render_template('app1.html')
 
 
@@ -58,15 +59,7 @@ def api(path):
         payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         user_id = payload["userid"]
         appname = payload["appname"]
-        # if appname == 'app1':
-        #     newurl = 'http://127.0.0.1:5001/'
-        #     print(newurl)
-        # elif appname == 'temperature':
-        #     newurl = 'http://127.0.0.1:5002/'
-        #     print(newurl)
-        # elif appname == 'headcount':
-        #     newurl = 'http://127.0.0.1:5003/'
-        #     print(newurl)
+
         if path == "exit":
             print("stopping "+appname + "-" + user_id)
             app_management.stop_container(appname + "-" + user_id)
@@ -98,19 +91,6 @@ def api(path):
     else:
         print('not a valid bearer authorization entry')
         return jsonify({'message': 'failed'})
-    # if path == 'get_average_power':
-    #     newurl = '127.0.0.1:5001'
-
-
-    #
-    # return jsonify({
-    #     'message': 'success',
-    #     'value': random.random()
-    # })
-
-    # newurl += '/api/'+path
-
-
 
 
 if __name__ == '__main__':

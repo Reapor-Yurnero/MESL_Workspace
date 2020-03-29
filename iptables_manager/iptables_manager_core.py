@@ -21,11 +21,11 @@ def create_chain(container_name: str):
         raise TypeError("container_name is expected to be str")
     elif container_name == '':
         raise ValueError("container_name is expected to be non empty")
-    cmd = "sudo iptables -N " + container_name+"-extn"
+    cmd = "sudo iptables -N " + container_name + "-extn"
     subprocess.run(split(cmd))
-    cmd = "iptables -I DOCKER-USER -j " + container_name+"-extn"
+    cmd = "iptables -I DOCKER-USER -j " + container_name + "-extn"
     subprocess.run(split(cmd))
-    cmd = "sudo iptables -N " + container_name+"-host"
+    cmd = "sudo iptables -N " + container_name + "-host"
     subprocess.run(split(cmd))
     cmd = "iptables -I INPUT -j " + container_name + "-host"
     subprocess.run(split(cmd))
