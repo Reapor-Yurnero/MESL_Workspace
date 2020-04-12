@@ -12,7 +12,7 @@ redis_password = ""
 redis_db = redis.StrictRedis(host=redis_host, port=redis_port, password=redis_password, decode_responses=True)
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 node_modules = os.path.join(os.path.dirname(os.path.abspath(__file__)), "node_modules")
 
 
@@ -49,6 +49,21 @@ def render_app3():
     cname = app_management.spawn_app("app3", "fxh")  # user name is hard coded here, can be fetched with multiple methods
     iptables_manager.grant_external_access(cname, redis_db.get(cname),"tcp","47.254.124.205","2222")
     return render_template('app3.html')
+
+
+@app.route('/appweb/', defaults={'path': ''})
+@app.route('/appweb/<path:path>')
+def appweb(path):
+    print(path)
+    if path == '':
+        print("invalid path")
+        return 404
+    arr = path.split("/")
+    pathlen = len(arr) - 1 if arr[-1] == '' else len(arr)
+    if pathlen == 1:
+        path += "index.html" if path[-1] == '/' else "/index.html"
+    print(path)
+    return app.send_static_file(path)
 
 
 @app.route('/api/<path:path>')

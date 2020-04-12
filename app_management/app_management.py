@@ -47,8 +47,8 @@ def register_app(app_name:str, ver:str, src_dir:str, start_cmd:str, build_env:st
 	# type check
 	if not isinstance(app_name, str):
 		raise TypeError("app name is expected to be str")
-	elif app_name == '' or len(app_name) > 11:
-		raise ValueError("app_name is expected to be a none empty string shorter than 12 characters")
+	elif app_name == '':
+		raise ValueError("app_name is expected to be a none empty string")
 	if not isinstance(ver, str):
 		raise TypeError("version number is expected to be str")
 	if not isinstance(src_dir, str):
@@ -116,12 +116,12 @@ def spawn_app(app_name:str, user_id:str, arguments:str = '') -> str:
 	# type check
 	if not isinstance(app_name, str):
 		raise TypeError("app name is expected to be str")
-	elif app_name == '' or len(app_name) > 11:
-		raise ValueError("app_name is expected to be a none empty string shorter than 12 characters")
+	elif app_name == '':
+		raise ValueError("app_name is expected to be a none empty string")
 	if not isinstance(user_id, str):
 		raise TypeError("user id is expected to be str")
-	elif user_id == '' or len(user_id) > 11:
-		raise ValueError("user_id is expected to be a none empty string shorter than 12 characters")
+	elif user_id == '':
+		raise ValueError("user_id is expected to be a none empty string")
 	if not isinstance(arguments, str):
 		raise TypeError("arguments is expected to be str")
 
